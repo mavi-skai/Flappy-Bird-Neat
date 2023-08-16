@@ -4,7 +4,6 @@ from sys import exit
 import random
 
 def pipe_movement(pipe_list):
-    print(len(pipe_list))
     if pipe_list:
         for pipe in pipe_list:
             pipe.x -= 4
@@ -22,6 +21,14 @@ def pipe_collision(bird,pipe_list):
                 return False
     return True
     
+
+def bird_animation():
+    global bird_scale, bird_index
+
+    bird_index += 0.1
+    if(bird_index>len(bird_fly)):
+        bird_index = 0
+    bird_scale = bird_fly[int(bird_index)]
 
 width = 500
 height = 670
@@ -46,7 +53,13 @@ text_rect = Generation.get_rect(center = (50,30))
 
 #bird
 bird = pygame.image.load('imgs/bird1.png').convert_alpha()
-bird_scale = pygame.transform.scale(bird,(bird.get_width()+10,bird.get_height() + 10))
+bird_fly_1 = pygame.image.load('imgs/bird1.png').convert_alpha()
+bird_fly_2 = pygame.image.load('imgs/bird2.png').convert_alpha()
+bird_fly_3 = pygame.image.load('imgs/bird3.png').convert_alpha()
+bird_fly = [bird_fly_1,bird_fly_2,bird_fly_3]
+bird_index = 0
+bird_surf = bird_fly[bird_index]
+bird_scale = pygame.transform.scale(bird_surf,(bird_surf.get_width()+10,bird_surf.get_height() + 10))
 bird_rect = bird_scale.get_rect(topleft = (200,300))
 bird_gravity = 0.5
 
@@ -72,7 +85,6 @@ while True:
 
             if event.type == pipe_timer:
                 pipe_list.append(pipe_scale.get_rect(topleft = (670,200)))
-                print('summon pipe')
     
     if game_active:
         # Background, ground and fonts
@@ -91,7 +103,7 @@ while True:
         bird_rect.y += bird_gravity
         if(bird_rect.bottom > screen.get_height() - ground_scale.get_height()):
             bird_rect.y = screen.get_height() - ground_scale.get_height() - bird_scale.get_height()
-            
+        bird_animation()
         screen.blit(bird_scale,bird_rect)
 
     
