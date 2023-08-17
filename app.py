@@ -2,25 +2,34 @@ import pygame
 pygame.init()
 from sys import exit
 import random 
-
+from pipe import Pipe
 
 class Bird(pygame.sprite.Sprite):
-
     def __init__(self):
         super().__init__()
         self.jumping = True
         self.bird_fly_1 = pygame.image.load('imgs/bird1.png').convert_alpha()
         self.bird_fly_2 = pygame.image.load('imgs/bird2.png').convert_alpha()
         self.bird_fly_3 = pygame.image.load('imgs/bird3.png').convert_alpha()
-        self.bird_fly = [self.bird_fly_1,self.bird_fly_2,self.bird_fly_3] #array of sprite
         self.bird_index = 0 #to increment sprite
-
+        # Scale factor for the bird images
+        scale_factor = 1.2 
+        # Scale the bird images
+        self.bird_fly_1 = pygame.transform.scale(self.bird_fly_1, 
+                                                 (int(self.bird_fly_1.get_width() * scale_factor), 
+                                                  int(self.bird_fly_1.get_height() * scale_factor)))
+        self.bird_fly_2 = pygame.transform.scale(self.bird_fly_2, 
+                                                 (int(self.bird_fly_2.get_width() * scale_factor), 
+                                                  int(self.bird_fly_2.get_height() * scale_factor)))
+        self.bird_fly_3 = pygame.transform.scale(self.bird_fly_3, 
+                                                 (int(self.bird_fly_3.get_width() * scale_factor), 
+                                                  int(self.bird_fly_3.get_height() * scale_factor)))
+        
+        self.bird_fly = [self.bird_fly_1,self.bird_fly_2,self.bird_fly_3] #array of sprite
         self.image = self.bird_fly[self.bird_index] #set sprite
-        self.image = pygame.transform.scale(self.image,(self.image.get_width()+5,self.image.get_height()+5)) #not working properly
         self.rect = self.image.get_rect(center = (200,300))
         self.bird_gravity = 0.5
         
-
 
     def bird_input(self):
         keys = pygame.key.get_pressed()
@@ -35,7 +44,6 @@ class Bird(pygame.sprite.Sprite):
         if (self.rect.x<=-80):
             self.kill()
 
-
     def apply_gravity(self):
         self.bird_gravity+=0.7
         self.rect.y += self.bird_gravity
@@ -48,35 +56,14 @@ class Bird(pygame.sprite.Sprite):
             self.bird_index = 0
         self.image = self.bird_fly[int(self.bird_index)]
         
-
     def update(self):
         self.animation()
         self.bird_input()
         self.apply_gravity()
 
    
-
-
-
-def pipe_movement(pipe_list):
-    if pipe_list:
-        for pipe in pipe_list:
-            pipe.x -= 4
-            screen.blit(pipe_scale,pipe)
-
-        pipe_list = [pipe for pipe in pipe_list if pipe.x > -85]
-        return pipe_list
-    else:
-        return []
-
-def pipe_collision(bird,pipe_list):
-    if pipe_list:
-        for pipe in pipe_list:
-            if bird.colliderect(pipe):
-                return False
-    return True
-    
-    
+def collision_sprite():
+    pygame.sprite.spritecollide(bird.sprite,pipe_group,False) #if true pipe will be deleted false no
 
 width = 500
 height = 670
@@ -104,15 +91,12 @@ bird = pygame.sprite.GroupSingle()
 bird.add(Bird())
 
 #pipe
-pipe = pygame.sprite.Group()
-pipe = pygame.image.load('imgs/pipe.png').convert_alpha()
-pipe_scale = pygame.transform.scale(pipe,(80,200))
-pipe_rect = pipe_scale.get_rect(topleft = (670,200))
-pipe_list = []
+pipe_group = pygame.sprite.Group()
+
 
 #Timer
 pipe_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(pipe_timer,1000)
+pygame.time.set_timer(pipe_timer,1500)
 
 while True:
     for event in pygame.event.get():
@@ -126,7 +110,11 @@ while True:
                     bird_gravity = -11
 
             if event.type == pipe_timer:
-                pipe_list.append(pipe_scale.get_rect(topleft = (670,200)))
+                pipe_group.add(Pipe(285,True))
+                pipe_group.add(Pipe(285,False))
+                #pipe_group.add(Pipe(50,True))
+               # pipe_list.append(pipe_scale.get_rect(midbottom = (670,570)))
+                #pipe_list.append(pipe_rotated.get_rect(midtop=(670,10)))
 
     
     if game_active:
@@ -138,18 +126,15 @@ while True:
         #pygame.draw.rect(screen,'Pink',bird_rect)
 
         #pipe
-        pipe_list = pipe_movement(pipe_list)
-        #game_active = pipe_collision(bird_rect,pipe_list)
+        pipe_group.draw(screen)
+        pipe_group.update()
 
         #Bird gravity
         bird.draw(screen) 
         bird.update() 
   
     
-    # if(bird_rect.collidedict(pipe_rect)):  colliding to pipe
-    #     pass
-    
-
+    pygame.display.flip()
     pygame.display.update()
     clock.tick(60)   # Limit the frame rate to 60 FPS
     
