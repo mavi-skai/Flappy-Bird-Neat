@@ -96,7 +96,7 @@ pipe_group = pygame.sprite.Group()
 
 #Timer
 pipe_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(pipe_timer,1500)
+pygame.time.set_timer(pipe_timer,1700)
 
 while True:
     for event in pygame.event.get():
@@ -110,24 +110,27 @@ while True:
                     bird_gravity = -11
 
             if event.type == pipe_timer:
-                pipe_group.add(Pipe(285,True))
-                pipe_group.add(Pipe(285,False))
-                #pipe_group.add(Pipe(50,True))
-               # pipe_list.append(pipe_scale.get_rect(midbottom = (670,570)))
-                #pipe_list.append(pipe_rotated.get_rect(midtop=(670,10)))
+                pipegap = 135
+                pipe_height = random.randint(-100, 100)
+                pipe_group.add(Pipe(False,(height//2)+pipe_height,pipegap))
+                pipe_group.add(Pipe(True,(height//2)+pipe_height,pipegap))
+
 
     
     if game_active:
-        # Background, ground and fonts
+        #background
         screen.blit(background_scale,(0,0)) #image , x,y
+        #pipe
+        pipe_group.draw(screen)
+        pipe_group.update()
+        #ground and fonts
         screen.blit(ground_scale,(0,screen.get_height() - ground_scale.get_height()))
         screen.blit(Generation,text_rect)
 
         #pygame.draw.rect(screen,'Pink',bird_rect)
 
-        #pipe
-        pipe_group.draw(screen)
-        pipe_group.update()
+        
+        #pipe_group.update(1)
 
         #Bird gravity
         bird.draw(screen) 
