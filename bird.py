@@ -3,6 +3,7 @@ import pygame
 class Bird(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        self.score = 0
         self.jumping = True
         self.bird_fly_1 = pygame.image.load('imgs/bird1.png').convert_alpha()
         self.bird_fly_2 = pygame.image.load('imgs/bird2.png').convert_alpha()

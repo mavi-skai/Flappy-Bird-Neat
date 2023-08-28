@@ -7,14 +7,35 @@ from bird import Bird
    
 def collision_sprite():
     global game_active
+    #Collision
+    # for bird in bird_group:
+    #     bird_mask = pygame.mask.from_surface(bird.image)
+    #     for pipe in pipe_group:
+    #         pipe_mask = pygame.mask.from_surface(pipe.image)
+    #         if bird_mask.overlap(pipe_mask, (pipe.rect.x - bird.rect.x, pipe.rect.y - bird.rect.y)):
+    #             continue
+                 #game_active = False
 
-    for bird in bird_group:
-        bird_mask = pygame.mask.from_surface(bird.image)
-        for pipe in pipe_group:
-            pipe_mask = pygame.mask.from_surface(pipe.image)
-            if bird_mask.overlap(pipe_mask, (pipe.rect.x - bird.rect.x, pipe.rect.y - bird.rect.y)):
-                print('collide')
-                game_active = False
+    if pygame.sprite.groupcollide(bird_group,pipe_group,False,False):
+        pass
+        #game_active = False
+
+def checkScore():
+    global score,score_trigger
+    if len(pipe_group) > 0:
+            if bird_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
+                and bird_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
+                and score_trigger == False:
+                score_trigger = True
+
+            if score_trigger == True:
+                if bird_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
+                    score += 1
+                    print(score)
+                    score_trigger = False
+
+                
+        
 
 #if(pygame.sprite.groupcollide(bird_group,pipe_group,False,False)):
 #pygame.draw.rect(screen,'Pink',bird_rect)
@@ -26,6 +47,8 @@ pygame.display.set_caption('Flappy Bird')  #set title
 pygame.display.set_icon(pygame.image.load('imgs/bird1.png')) #set icon
 clock = pygame.time.Clock()
 game_active = True
+score = 0
+score_trigger = False
 
 #Image load
 background = pygame.image.load('imgs/bg.png').convert_alpha() # Load the image
@@ -38,7 +61,8 @@ ground_scale =  pygame.transform.scale(ground,(width,100))
 #fonts
 font = pygame.font.Font('font/pixeltype.ttf',50) #create font
 Generation = font.render('Generation: ',False,'Blue') #create surface for font
-text_rect = Generation.get_rect(center = (50,30))
+text_rect = Generation.get_rect(center = (100,30))
+score 
 
 #bird
 bird_group = pygame.sprite.Group()
@@ -47,10 +71,9 @@ bird_group.add(Bird())
 #pipe
 pipe_group = pygame.sprite.Group()
 
-
 #Timer
 pipe_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(pipe_timer,1700)
+pygame.time.set_timer(pipe_timer,2700)
 
 while True:
     for event in pygame.event.get():
@@ -89,6 +112,7 @@ while True:
 
         #collision
         collision_sprite()
+        checkScore()
   
     
     pygame.display.flip()
